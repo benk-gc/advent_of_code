@@ -75,8 +75,8 @@ module AdventOfCode
       class Line < Array
         def valid?(constraints)
           each_with_before_after.all? do |element, befores, afters|
-            constraints.befores[element].intersection(befores).empty? &&
-              constraints.afters[element].intersection(afters).empty?
+            constraints.befores[element].intersection(afters).empty? &&
+              constraints.afters[element].intersection(befores).empty?
           end
         end
 
@@ -91,7 +91,7 @@ module AdventOfCode
         def middle
           raise "This line doesn't have a middle" if size.even?
 
-          fetch((size / 2) - 1)
+          fetch(size / 2)
         end
 
         private

@@ -9,7 +9,7 @@ RSpec.describe AdventOfCode::Year2024::Day05 do
       12|20
       50|33
 
-      1,99,20
+      1,99,12
       1,2,3,4,5
       1,33,50
       6,7,8,9,10
@@ -21,7 +21,7 @@ RSpec.describe AdventOfCode::Year2024::Day05 do
   end
 
   let(:parsed_lines) do
-    [[1, 99, 20], [1, 2, 3, 4, 5], [1, 33, 50], [6, 7, 8, 9, 10]]
+    [[1, 99, 12], [1, 2, 3, 4, 5], [1, 33, 50], [6, 7, 8, 9, 10]]
   end
 
   it "parses the problem correctly" do
