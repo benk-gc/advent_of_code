@@ -6,3 +6,15 @@ AllCops:
 
 RSpec/ExampleLength:
   Max: 20
+
+RSpec/MultipleExpectations:
+  Max: 10
+
+Naming/MethodParameterName:
+  MinNameLength: 1
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/WordArray:
+  EnforcedStyle: brackets
