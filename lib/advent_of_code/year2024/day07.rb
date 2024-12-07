@@ -34,10 +34,6 @@ module AdventOfCode
           (OPERATORS * cons).combination(cons).lazy(&block)
         end
 
-        def interleave(arr1, arr2)
-          arr1.zip(arr2).flatten.compact
-        end
-
         delegate :values, :solution, to: :equation
       end
 
