@@ -83,10 +83,6 @@ RSpec.describe AdventOfCode::Year2024::Day06 do
       expect(matrix.element(1, 2)).to eq("F")
     end
 
-    it "has the correct bounds" do
-      expect(matrix).to have_attributes(x_max: 1, y_max: 2)
-    end
-
     it "raises an error when we access elements out of bounds" do
       expect { matrix.element(-1, -1) }.to raise_error(described_class::OutOfBoundsError)
       expect { matrix.element(2, 3) }.to raise_error(described_class::OutOfBoundsError)

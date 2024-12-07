@@ -31,32 +31,38 @@ module AdventOfCode
         def next_tile
           map.element(*guard.next_position)
         end
-
-        private
-
-        attr_reader :raw_map
       end
 
-      class Map
-        OBSTACLE = "#"
+      class StringMatrix
+        OutOfBoundsError = Class.new(IndexError)
+
+        attr_reader :rows
+
+        def initialize(rows)
+          @rows = rows
+        end
+
+        def element(x, y)
+          raise IndexError if x.negative? || y.negative?
+
+          rows.fetch(y).fetch(x)
+        rescue IndexError
+          raise OutOfBoundsError
+        end
+      end
+
+      class Map < StringMatrix
         FREE = "."
+        OBSTACLE = "#"
 
         def self.from_raw(raw_map)
           new(
             raw_map.
-              gsub(/[^#{OBSTACLE}#{FREE}\s]/o, ".").
+              gsub(/[^#{FREE}#{OBSTACLE}\s]/o, ".").
               split("\n").
               map(&:chars),
           )
         end
-
-        attr_reader :map
-
-        def initialize(map)
-          @map = StringMatrix.new(map)
-        end
-
-        delegate :element, to: :map
       end
 
       class Guard
@@ -105,26 +111,6 @@ module AdventOfCode
           else
             raise "#{current_direction} isn't a valid direction"
           end
-        end
-      end
-
-      class StringMatrix
-        OutOfBoundsError = Class.new(IndexError)
-
-        attr_reader :rows, :x_max, :y_max
-
-        def initialize(rows)
-          @rows = rows
-          @x_max = rows.first.size - 1
-          @y_max = rows.size - 1
-        end
-
-        def element(x, y)
-          raise IndexError if x.negative? || y.negative?
-
-          rows.fetch(y).fetch(x)
-        rescue IndexError
-          raise OutOfBoundsError
         end
       end
 
