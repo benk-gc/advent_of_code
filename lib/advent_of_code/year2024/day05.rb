@@ -109,7 +109,7 @@ module AdventOfCode
         @raw_problem = raw_problem
       end
 
-      def solution
+      def solution_part1
         lines.filter_valid(constraints).sum(&:middle)
       end
 

@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/advent_of_code"
+
+klass = ARGV[0]
+current_dir = __dir__
+root_dir = File.dirname(current_dir)
+input_filename = klass.split("::").second.downcase + ".txt"
+
+unless klass
+  puts "Please supply the class to solve like ./bin/solve Year2024::Day01"
+  exit(1)
+end
+
+puts "Solving for #{klass}"
+puts "---"
+
+begin
+  input_text = File.read(File.join(root_dir, "inputs", input_filename))
+  solver = "AdventOfCode::#{klass}".constantize.new(input_text)
+
+  [:solution_part1, :solution_part2].each do |method_name|
+    if solver.respond_to?(method_name)
+      puts "#{method_name}: #{solver.send(method_name)}"
+    end
+  end
+rescue Errno::ENOENT
+  puts "Cannot find the input text file. Please create #{input_filename}"
+  exit(1)
+rescue StandardError => e
+  puts "Solver failed: #{e}"
+  exit(1)
+end
+
+exit(0)

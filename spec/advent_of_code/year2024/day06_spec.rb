@@ -90,7 +90,7 @@ RSpec.describe AdventOfCode::Year2024::Day06 do
   end
 
   describe "#solution" do
-    subject(:solution) { described_class.new(sample_problem).solution }
+    subject(:solution) { described_class.new(sample_problem).solution_part1 }
 
     let(:sample_problem) do
       <<~MAP.chomp

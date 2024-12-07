@@ -49,6 +49,6 @@ RSpec.describe AdventOfCode::Year2024::Day05 do
   end
 
   it "returns the correct solution" do
-    expect(instance.solution).to eq(11)
+    expect(instance.solution_part1).to eq(11)
   end
 end
