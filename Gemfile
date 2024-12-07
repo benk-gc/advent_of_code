@@ -12,3 +12,5 @@ gem "rubocop", "~> 1.69"
 gem "rubocop-rspec", "~> 3.2"
 
 gem "gc_ruboconfig", "~> 5.0"
+
+gem "rspec-its", "~> 2.0"

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "debug"
+require "rspec/its"
 require "advent_of_code"
 
 RSpec.configure do |config|
