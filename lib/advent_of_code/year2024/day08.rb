@@ -21,19 +21,17 @@ module AdventOfCode
             found_nodes[element] = found_nodes[element] << coord
           end
 
-          coords = if limit
-                     # Now for each pair of similar nodes, calculate the resonance,
-                     # and filter out any points that aren't inside the map.
-                     found_nodes.values.map do |coords|
-                       CoordGroup.new(coords).resonance_points
-                     end.reduce(:+)
-                   else
-                     found_nodes.values.map do |coords|
-                       CoordGroup.new(coords).all_resonance_points_within(map.limit)
-                     end.reduce(:+)
-                   end
+          resonance_points = found_nodes.values.map do |coords|
+            if limit
+              CoordGroup.new(coords).resonance_points
+            else
+              CoordGroup.new(coords).all_resonance_points_within(map.limit)
+            end
+          end
 
-          coords.filter { |coord| map.contains?(coord) }.to_set
+          resonance_points.
+            reduce(:+).
+            filter { |coord| map.contains?(coord) }.to_set
         end
       end
 
