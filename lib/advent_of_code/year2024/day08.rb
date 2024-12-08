@@ -15,27 +15,27 @@ module AdventOfCode
         def antinodes
           found_nodes = Hash.new { Set.new }
 
-          map.elements.each do |element, position|
+          map.elements.each do |element, coord|
             next unless element.in?(PYLONS)
 
-            found_nodes[element] = found_nodes[element] << position
+            found_nodes[element] = found_nodes[element] << coord
           end
 
           # Now for each pair of similar nodes, calculate the resonance,
           # and filter out any points that aren't inside the map.
           found_nodes.values.
-            map { |nodes| NodeGroup.new(nodes).resonance_points }.
+            map { |coords| CoordGroup.new(coords).resonance_points }.
             reduce(:+).
-            filter { |x, y| map.contains?(x, y) }.
+            filter { |coord| map.contains?(coord) }.
             to_set
         end
       end
 
-      class NodeGroup
-        attr_reader :nodes
+      class CoordGroup
+        attr_reader :coords
 
-        def initialize(nodes)
-          @nodes = nodes
+        def initialize(coords)
+          @coords = coords
         end
 
         # My matrix algebra is a bit rusty so this is how this works.
@@ -69,18 +69,51 @@ module AdventOfCode
         # Success!
         def resonance_points
           node_pairs.map do |node_1, node_2|
-            offset = node_1.zip(node_2).map { |p| p.reduce(:-) }
-
-            [
-              node_1.zip(offset).map(&:sum),
-              node_2.zip(offset).map { |p| p.reduce(:-) },
-            ]
+            [resonance_point(node_1, node_2), resonance_point(node_2, node_1)]
           end.reduce(:+)
         end
 
-        def node_pairs
-          @node_pairs ||= nodes.to_a.combination(2)
+        def resonance_point(node_1, node_2)
+          node_1 + (node_1 - node_2)
         end
+
+        def node_pairs
+          @node_pairs ||= coords.to_a.combination(2)
+        end
+      end
+
+      class Coord
+        attr_reader :x, :y
+
+        def initialize(x, y)
+          @x = x
+          @y = y
+        end
+
+        def +(other)
+          self.class.new(x + other.x, y + other.y)
+        end
+
+        def -(other)
+          self.class.new(x - other.x, y - other.y)
+        end
+
+        def negative?
+          x.negative? || y.negative?
+        end
+
+        def to_a
+          [x, y]
+        end
+
+        def ==(other)
+          to_a == other.to_a
+        end
+
+        alias_method :inspect, :to_a
+        alias_method :eql?, :==
+
+        delegate :hash, to: :to_a
       end
 
       class StringMatrix
@@ -94,10 +127,10 @@ module AdventOfCode
           @y_max = rows.size - 1
         end
 
-        def element(x, y)
-          raise IndexError if x.negative? || y.negative?
+        def element(coord)
+          raise IndexError if coord.negative?
 
-          rows.fetch(y).fetch(x)
+          rows.fetch(coord.y).fetch(coord.x)
         rescue IndexError
           raise OutOfBoundsError
         end
@@ -108,14 +141,16 @@ module AdventOfCode
           Enumerator.new do |yielder|
             (0..y_max).each do |y|
               (0..x_max).each do |x|
-                yielder.yield element(x, y), [x, y]
+                Coord.new(x, y).then do |coord|
+                  yielder.yield element(coord), coord
+                end
               end
             end
           end
         end
 
-        def contains?(x, y)
-          element(x, y).present?
+        def contains?(coord)
+          element(coord).present?
         rescue OutOfBoundsError
           false
         end

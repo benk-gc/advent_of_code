@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe AdventOfCode::Year2024::Day08 do
-  describe "NodeGroup" do
-    subject { described_class::NodeGroup.new(nodes) }
+  describe "CoordGroup" do
+    subject { described_class::CoordGroup.new(coords) }
 
     # Our matrix and solution:
     #
@@ -10,11 +10,15 @@ RSpec.describe AdventOfCode::Year2024::Day08 do
     #   * P * *
     #   * * P *
     #   * * * N
-    let(:nodes) do
-      [[1, 1], [2, 2]].shuffle
+    let(:coords) do
+      [described_class::Coord.new(1, 1), described_class::Coord.new(2, 2)].shuffle
     end
 
-    its(:resonance_points) { is_expected.to contain_exactly([0, 0], [3, 3]) }
+    let(:resonance_points) do
+      [described_class::Coord.new(0, 0), described_class::Coord.new(3, 3)]
+    end
+
+    its(:resonance_points) { is_expected.to match_array(resonance_points) }
   end
 
   describe "StringMatrix" do
@@ -30,12 +34,12 @@ RSpec.describe AdventOfCode::Year2024::Day08 do
     describe "#elements" do
       let(:expected_elements) do
         [
-          ["A", [0, 0]],
-          ["B", [1, 0]],
-          ["C", [2, 0]],
-          ["D", [0, 1]],
-          ["E", [1, 1]],
-          ["F", [2, 1]],
+          ["A", described_class::Coord.new(0, 0)],
+          ["B", described_class::Coord.new(1, 0)],
+          ["C", described_class::Coord.new(2, 0)],
+          ["D", described_class::Coord.new(0, 1)],
+          ["E", described_class::Coord.new(1, 1)],
+          ["F", described_class::Coord.new(2, 1)],
         ]
       end
 
