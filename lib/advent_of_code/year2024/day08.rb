@@ -85,8 +85,10 @@ module AdventOfCode
           end.reduce(:+)
         end
 
+        private
+
         def all_resonance_points_for(node_1, node_2, limit)
-          point = node_1 + (node_1 - node_2)
+          point = resonance_point_for(node_1, node_2)
 
           return [] if point.negative? || point > limit
 
