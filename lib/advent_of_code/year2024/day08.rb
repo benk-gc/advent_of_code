@@ -12,7 +12,7 @@ module AdventOfCode
           @map = map
         end
 
-        def antinodes
+        def antinodes(limit: true)
           found_nodes = Hash.new { Set.new }
 
           map.elements.each do |element, coord|
@@ -21,13 +21,19 @@ module AdventOfCode
             found_nodes[element] = found_nodes[element] << coord
           end
 
-          # Now for each pair of similar nodes, calculate the resonance,
-          # and filter out any points that aren't inside the map.
-          found_nodes.values.
-            map { |coords| CoordGroup.new(coords).resonance_points }.
-            reduce(:+).
-            filter { |coord| map.contains?(coord) }.
-            to_set
+          coords = if limit
+                     # Now for each pair of similar nodes, calculate the resonance,
+                     # and filter out any points that aren't inside the map.
+                     found_nodes.values.map do |coords|
+                       CoordGroup.new(coords).resonance_points
+                     end.reduce(:+)
+                   else
+                     found_nodes.values.map do |coords|
+                       CoordGroup.new(coords).all_resonance_points_within(map.x_max, map.y_max)
+                     end.reduce(:+)
+                   end
+
+          coords.filter { |coord| map.contains?(coord) }.to_set
         end
       end
 
@@ -69,11 +75,27 @@ module AdventOfCode
         # Success!
         def resonance_points
           node_pairs.map do |node_1, node_2|
-            [resonance_point(node_1, node_2), resonance_point(node_2, node_1)]
+            [resonance_point_for(node_1, node_2), resonance_point_for(node_2, node_1)]
           end.reduce(:+)
         end
 
-        def resonance_point(node_1, node_2)
+        def all_resonance_points_within(x_max, y_max)
+          node_pairs.map do |node_1, node_2|
+            all_resonance_points_for(node_1, node_2, x_max, y_max) +
+              all_resonance_points_for(node_2, node_1, x_max, y_max) +
+              [node_1, node_2] # The antennas are also antinodes.
+          end.reduce(:+)
+        end
+
+        def all_resonance_points_for(node_1, node_2, x_max, y_max)
+          point = node_1 + (node_1 - node_2)
+
+          return [] if point.negative? || point.x > x_max || point.y > y_max
+
+          [point] + all_resonance_points_for(point, node_1, x_max, y_max)
+        end
+
+        def resonance_point_for(node_1, node_2)
           node_1 + (node_1 - node_2)
         end
 
@@ -172,6 +194,10 @@ module AdventOfCode
 
       def solution_part1
         AntinodeFinder.new(map).antinodes.count
+      end
+
+      def solution_part2
+        AntinodeFinder.new(map).antinodes(limit: false).count
       end
 
       def map
