@@ -29,7 +29,7 @@ module AdventOfCode
                      end.reduce(:+)
                    else
                      found_nodes.values.map do |coords|
-                       CoordGroup.new(coords).all_resonance_points_within(map.x_max, map.y_max)
+                       CoordGroup.new(coords).all_resonance_points_within(map.limit)
                      end.reduce(:+)
                    end
 
@@ -79,20 +79,20 @@ module AdventOfCode
           end.reduce(:+)
         end
 
-        def all_resonance_points_within(x_max, y_max)
+        def all_resonance_points_within(limit)
           node_pairs.map do |node_1, node_2|
-            all_resonance_points_for(node_1, node_2, x_max, y_max) +
-              all_resonance_points_for(node_2, node_1, x_max, y_max) +
+            all_resonance_points_for(node_1, node_2, limit) +
+              all_resonance_points_for(node_2, node_1, limit) +
               [node_1, node_2] # The antennas are also antinodes.
           end.reduce(:+)
         end
 
-        def all_resonance_points_for(node_1, node_2, x_max, y_max)
+        def all_resonance_points_for(node_1, node_2, limit)
           point = node_1 + (node_1 - node_2)
 
-          return [] if point.negative? || point.x > x_max || point.y > y_max
+          return [] if point.negative? || point > limit
 
-          [point] + all_resonance_points_for(point, node_1, x_max, y_max)
+          [point] + all_resonance_points_for(point, node_1, limit)
         end
 
         def resonance_point_for(node_1, node_2)
@@ -101,90 +101,6 @@ module AdventOfCode
 
         def node_pairs
           @node_pairs ||= coords.to_a.combination(2)
-        end
-      end
-
-      class Coord
-        attr_reader :x, :y
-
-        def initialize(x, y)
-          @x = x
-          @y = y
-        end
-
-        def +(other)
-          self.class.new(x + other.x, y + other.y)
-        end
-
-        def -(other)
-          self.class.new(x - other.x, y - other.y)
-        end
-
-        def negative?
-          x.negative? || y.negative?
-        end
-
-        def to_a
-          [x, y]
-        end
-
-        def ==(other)
-          to_a == other.to_a
-        end
-
-        alias_method :inspect, :to_a
-        alias_method :eql?, :==
-
-        delegate :hash, to: :to_a
-      end
-
-      class StringMatrix
-        OutOfBoundsError = Class.new(IndexError)
-
-        attr_reader :rows, :x_max, :y_max
-
-        def initialize(rows)
-          @rows = rows
-          @x_max = rows.first.size - 1
-          @y_max = rows.size - 1
-        end
-
-        def element(coord)
-          raise IndexError if coord.negative?
-
-          rows.fetch(coord.y).fetch(coord.x)
-        rescue IndexError
-          raise OutOfBoundsError
-        end
-
-        # Iterates across each row, left-to-right, top-to-bottom.
-        # It returns the element and the co-ordinate.
-        def elements
-          Enumerator.new do |yielder|
-            (0..y_max).each do |y|
-              (0..x_max).each do |x|
-                Coord.new(x, y).then do |coord|
-                  yielder.yield element(coord), coord
-                end
-              end
-            end
-          end
-        end
-
-        def contains?(coord)
-          element(coord).present?
-        rescue OutOfBoundsError
-          false
-        end
-      end
-
-      class Map < StringMatrix
-        def self.from_raw(raw_map)
-          new(
-            raw_map.
-              split("\n").
-              map(&:chars),
-          )
         end
       end
 
