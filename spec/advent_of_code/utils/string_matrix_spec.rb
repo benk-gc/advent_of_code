@@ -50,7 +50,7 @@ RSpec.describe StringMatrix do
     end
   end
 
-  describe "#vertical_order" do
+  describe "#vertical_symmetry" do
     context "for an unsymmetrical matrix" do
       let(:rows) do
         [
@@ -62,7 +62,7 @@ RSpec.describe StringMatrix do
       end
 
       it "returns 0" do
-        expect(matrix.vertical_order(4, "x")).to eq(0.0)
+        expect(matrix.vertical_symmetry(4, "x")).to eq(0.0)
       end
     end
 
@@ -77,7 +77,7 @@ RSpec.describe StringMatrix do
       end
 
       it "returns 0.5" do
-        expect(matrix.vertical_order(4, "x")).to eq(0.5)
+        expect(matrix.vertical_symmetry(4, "x")).to eq(0.5)
       end
     end
 
@@ -92,7 +92,22 @@ RSpec.describe StringMatrix do
       end
 
       it "returns 1" do
-        expect(matrix.vertical_order(4, "x")).to eq(1.0)
+        expect(matrix.vertical_symmetry(4, "x")).to eq(1.0)
+      end
+    end
+
+    context "for a completely symmetrical matrix with a midline" do
+      let(:rows) do
+        [
+          [".", ".", ".", ".", "."],
+          ["x", ".", "x", ".", "x"],
+          ["x", ".", "x", ".", "x"],
+          [".", ".", ".", ".", "."],
+        ]
+      end
+
+      it "returns 1" do
+        expect(matrix.vertical_symmetry(6, "x")).to eq(1.0)
       end
     end
   end

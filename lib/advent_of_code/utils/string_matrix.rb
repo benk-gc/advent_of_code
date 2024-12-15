@@ -48,28 +48,30 @@ class StringMatrix
     false
   end
 
-  def vertical_order(element_total, match_char)
+  # This isn't the most optimal way to do this - for a list of actors it's
+  # faster to just partition the actions over the bounds of the matrix, but
+  # this is a nice way to do this if we already have the characters in the
+  # matrix. We could also trivially extend this for multiple characters.
+  def vertical_symmetry(element_total, match_char)
     x_mid = limit.x.fdiv(2).ceil
 
     # We can do this in a single pass over a half, by iterating and finding all
     # elements, the checking if they correspond to an element on the other side.
     match_count = (0..limit.y).sum do |y|
-      (0..x_mid).sum do |x|
+      (0..x_mid).sum(0.0) do |x|
         left_char = element(Coord.new(x, y))
 
         # We don't want to count background chars.
-        next 0 unless left_char == match_char
+        next 0.0 unless left_char == match_char
 
-        # If we're on the midline, the character is always a match.
-        next 1 if x == x_mid
+        # If we're on the midline in an odd matrix, the character is always a match.
+        # Since this only eliminates a single character it counts as half a match.
+        next 0.5 if x == x_mid && limit.x.even?
 
-        right_char = element(Coord.new(limit.x - x, y))
-
-        left_char == right_char ? 1 : 0
+        left_char == element(Coord.new(limit.x - x, y)) ? 1.0 : 0.0
       end
     end
 
-    # Technically this could be > 1 if we have lots on the midline.
     match_count.fdiv(element_total.fdiv(2))
   end
 end

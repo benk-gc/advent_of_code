@@ -68,7 +68,7 @@ module AdventOfCode
 
           actors.each { |a| tick_map.write(actor_char, a.current_position) }
 
-          return tick if tick_map.vertical_order(actor_count, actor_char) > 0.5
+          return tick if tick_map.vertical_symmetry(actor_count, actor_char) > 0.5
 
           actors.each { |a| a.move_with_wraparound!(map) }
         end
