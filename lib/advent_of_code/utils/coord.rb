@@ -16,6 +16,10 @@ class Coord
     self.class.new(x - other.x, y - other.y)
   end
 
+  def *(other)
+    self.class.new(x * other.x, y * other.x)
+  end
+
   def >(other)
     x > other.x || y > other.y
   end

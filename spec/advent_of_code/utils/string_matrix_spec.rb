@@ -26,4 +26,74 @@ RSpec.describe StringMatrix do
       expect(matrix.elements.to_a).to eq(expected_elements)
     end
   end
+
+  describe "#draw" do
+    let(:expected_draw) do
+      <<~TXT.chomp
+        ABC
+        DEF
+      TXT
+    end
+
+    it "draws the expected map" do
+      expect(matrix.draw).to eq(expected_draw)
+    end
+  end
+
+  describe "#write" do
+    let(:coord) { Coord.new(1, 0) }
+
+    it "changes the element" do
+      expect { matrix.write("G", coord) }.
+        to change { matrix.element(coord) }.
+        from("B").to("G")
+    end
+  end
+
+  describe "#vertical_order" do
+    context "for an unsymmetrical matrix" do
+      let(:rows) do
+        [
+          [".", ".", ".", "x"],
+          [".", ".", ".", "x"],
+          [".", ".", ".", "x"],
+          [".", ".", ".", "x"],
+        ]
+      end
+
+      it "returns 0" do
+        expect(matrix.vertical_order(4, "x")).to eq(0.0)
+      end
+    end
+
+    context "for a partially symmetrical matrix" do
+      let(:rows) do
+        [
+          [".", ".", ".", "x"],
+          ["x", ".", ".", "x"],
+          ["x", ".", ".", "."],
+          [".", ".", ".", "."],
+        ]
+      end
+
+      it "returns 0.5" do
+        expect(matrix.vertical_order(4, "x")).to eq(0.5)
+      end
+    end
+
+    context "for a completely symmetrical matrix" do
+      let(:rows) do
+        [
+          [".", ".", ".", "."],
+          ["x", ".", ".", "x"],
+          ["x", ".", ".", "x"],
+          [".", ".", ".", "."],
+        ]
+      end
+
+      it "returns 1" do
+        expect(matrix.vertical_order(4, "x")).to eq(1.0)
+      end
+    end
+  end
 end
