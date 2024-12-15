@@ -26,10 +26,10 @@ RSpec.describe AdventOfCode::Year2024::Day14 do
   end
 
   context "solves the calibration problem for part 1" do
-    subject(:solution) { scenario.solve(ticks) }
+    subject(:solution) { problem.solve(ticks) }
 
     let(:ticks) { 100 }
-    let(:scenario) { described_class::Scenario.new(map, actors) }
+    let(:problem) { described_class::Scenario.new(map, actors) }
     let(:map) { Map.new(Array.new(7, Array.new(11, "."))) }
     let(:actors) { described_class::ActorParser.from_raw(raw_actors) }
 

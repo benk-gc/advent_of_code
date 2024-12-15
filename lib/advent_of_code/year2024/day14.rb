@@ -54,33 +54,21 @@ module AdventOfCode
       end
 
       def solution_part1
-        map = Map.new(Array.new(103, Array.new(101, ".")))
-        actors = ActorParser.from_raw(raw_problem)
-        Scenario.new(map, actors).solve(100)
+        Scenario.new(generate_map, parse_actors).solve(100)
       end
 
-      def solution_part2(tstart = 1, interval = 20_000, threshold = 0.5)
-        tend = tstart + interval
-        map = Map.new(Array.new(103, Array.new(101, ".")))
-        actors = ActorParser.from_raw(raw_problem)
+      def solution_part2
+        map = generate_map
+        actors = parse_actors
         actor_count = actors.count
         actor_char = "x"
 
-        (tstart..tend).each do |tick|
-          row = Array.new(101, ".")
-          tick_map = Map.new(Array.new(103) { row.dup })
+        (0..20_000).each do |tick|
+          tick_map = generate_map
 
           actors.each { |a| tick_map.write(actor_char, a.current_position) }
 
-          symmetry = tick_map.vertical_order(actor_count, actor_char)
-
-          if symmetry > threshold
-            # debug helper
-            # puts "Tick: #{tick}\nSymmetry: #{symmetry}\n\n" + tick_map.draw + "\n---\n"
-
-            # Technically the number of seconds is 1 behind the tick.
-            return tick - 1
-          end
+          return tick if tick_map.vertical_order(actor_count, actor_char) > 0.5
 
           actors.each { |a| a.move_with_wraparound!(map) }
         end
@@ -89,6 +77,15 @@ module AdventOfCode
       end
 
       private
+
+      def generate_map
+        row = Array.new(101, ".")
+        Map.new(Array.new(103) { row.dup })
+      end
+
+      def parse_actors
+        ActorParser.from_raw(raw_problem)
+      end
 
       attr_reader :raw_problem
     end
