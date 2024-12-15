@@ -21,3 +21,6 @@ Style/WordArray:
 
 Performance/Sum:
   Enabled: false
+
+RSpec/Pending:
+  Enabled: false

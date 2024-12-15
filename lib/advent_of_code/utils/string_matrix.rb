@@ -18,6 +18,14 @@ class StringMatrix
     raise OutOfBoundsError
   end
 
+  # Yes, we could do this in-place, but this is more readable.
+  def transpose(a, b)
+    char_a = element(a)
+    char_b = element(b)
+    write(char_b, a)
+    write(char_a, b)
+  end
+
   # Iterates across each row, left-to-right, top-to-bottom.
   # It returns the element and the co-ordinate.
   def elements
