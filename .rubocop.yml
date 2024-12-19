@@ -24,3 +24,6 @@ Performance/Sum:
 
 RSpec/Pending:
   Enabled: false
+
+RSpec/NestedGroups:
+  Max: 5
