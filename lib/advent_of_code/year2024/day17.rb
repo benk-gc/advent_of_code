@@ -27,6 +27,17 @@ module AdventOfCode
       end
 
       class Parser
+        def self.parse_problem(raw_input)
+          registers, raw_program = raw_input.split("\n\n")
+
+          register_a, register_b, register_c = registers.
+            split("\n").map { |l| l.split.last.to_i }
+
+          program = Parser.parse_program(raw_program)
+
+          [register_a, register_b, register_c, program]
+        end
+
         def self.parse_program(raw_program)
           raw_program.split.last.split(",").map(&:to_i)
         end
@@ -37,12 +48,7 @@ module AdventOfCode
         Halt = Class.new(StandardError)
 
         def self.run(raw_input)
-          registers, raw_program = raw_input.split("\n\n")
-
-          register_a, register_b, register_c = registers.
-            split("\n").map { |l| l.split.last.to_i }
-
-          program = Parser.parse_program(raw_program)
+          register_a, register_b, register_c, program = Parser.parse_problem(raw_input)
 
           new(register_a, register_b, register_c).run(program)
         end
@@ -147,6 +153,19 @@ module AdventOfCode
 
       def solution_part1
         Computer.run(raw_problem)
+      end
+
+      def solution_part2
+        _, register_b, register_c, program = Parser.parse_problem(raw_problem)
+        expected_output = program.join(",")
+
+        (0..1_000_000_000).each do |register_a|
+          output = Computer.new(register_a, register_b, register_c).run(program)
+
+          return i if output == expected_output
+        end
+
+        "no solution found"
       end
 
       private
