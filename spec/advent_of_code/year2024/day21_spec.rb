@@ -19,7 +19,8 @@ RSpec.describe AdventOfCode::Year2024::Day21 do
     let(:buttons) { ["1", "7", "6", "8"] }
 
     it "generates a valid activation sequence" do
-      expect(solver.activation_sequence(buttons)).to eq("^<<A^^Av>>A<^A")
+      expect(solver.activation_sequence(buttons).join).
+        to eq("^<<A^^Av>>A<^A")
     end
   end
 

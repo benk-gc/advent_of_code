@@ -16,6 +16,7 @@ class Keypad < Map
     end
 
     @home_key = position("A")
+    @solution_cache = {}
   end
 
   def position(button_char)

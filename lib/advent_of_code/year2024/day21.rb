@@ -15,24 +15,39 @@ module AdventOfCode
 
         def initialize(keypad)
           @keypad = keypad
+          @solution_cache = {}
         end
 
         def activation_sequence(buttons)
           # The robot always start at A.
           buttons = ["A"] + buttons
 
-          movements = buttons.each_cons(2).map do |from, to|
-            translate_movements(
-              keypad.navigate(
-                from_coord: keypad.position(from),
-                to_coord: keypad.position(to),
-              ),
-            )
+          puts "#{buttons.count} buttons" if ENV["AOC_DEBUG"]
+
+          movements = []
+
+          buttons.each_cons(2).each do |from, to|
+            cache_key = [from, to]
+            cached_solution = @solution_cache[cache_key]
+
+            if cached_solution
+              movements.push(*cached_solution)
+              next
+            else
+              solution = translate_movements(
+                keypad.navigate(
+                  from_coord: keypad.position(from),
+                  to_coord: keypad.position(to),
+                ),
+              ) + ["A"]
+
+              @solution_cache[cache_key] = solution
+
+              movements.push(*solution)
+            end
           end
 
-          # Join the movements and activations, remembering to activate
-          # the last button as well.
-          movements.map(&:join).join("A") + "A"
+          movements
         end
 
         # Translate the movements into directional instructions.
@@ -45,41 +60,43 @@ module AdventOfCode
         @raw_problem = problem
       end
 
-      def solve(buttons)
+      def solve(buttons, robots: 2)
+        puts "#{Time.now} solving" if ENV["AOC_DEBUG"]
+
         numeric_solver = Solver.new(numeric_keypad)
         directional_solver = Solver.new(directional_keypad)
 
-        # First robot 1 types the code on the numeric keypad.
-        solution_1 = numeric_solver.activation_sequence(buttons)
-
-        # Then robot 2 types these buttons on the directional keypad.
-        solution_2 = directional_solver.activation_sequence(solution_1.chars)
-
-        # Then the second robot types these buttons on the directional keypad.
-        solution_3 = directional_solver.activation_sequence(solution_2.chars)
-
-        # Then finally you type these on your directional pad.
         results = [
-          solution_3,
-          solution_2,
-          solution_1,
           buttons.join,
+          # First robot 1 types the code on the numeric keypad.
+          numeric_solver.activation_sequence(buttons),
         ]
 
+        robots.times.each do |i|
+          puts "#{Time.now} robot #{i}" if ENV["AOC_DEBUG"]
+          results << directional_solver.activation_sequence(results.last)
+        end
+
         if ENV["AOC_DEBUG"]
-          puts results
-          puts "#{solution_3.length} * #{buttons[0..3].join.to_i}"
-          puts solution_3.length * buttons[0..3].join.to_i
+          puts results.reverse
+          puts "#{results.last.length} * #{buttons[0..3].join.to_i}"
+          puts results.last.length * buttons[0..3].join.to_i
 
           puts "---"
         end
 
-        solution_3.length * buttons[0..3].join.to_i
+        results.last.length * buttons[0..3].join.to_i
       end
 
       def solution_part1
         button_sequences.
-          map { |buttons| solve(buttons) }.
+          map { |buttons| solve(buttons, robots: 2) }.
+          sum
+      end
+
+      def solution_part2
+        button_sequences.
+          map { |buttons| solve(buttons, robots: 25) }.
           sum
       end
 
